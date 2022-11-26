@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  photo-server:
+    image: "michalbl4/photo-server:latest"
+    ports:
+        - 8080:8080
+    environment:
+        # Искусственная задержка скачивания (в секундах между отправками частей архива). Если 0, то задержки нет
+        DELAY: 0
+        # Логирование - включить или выключить
+        LOGGING: True
+    volumes:
+        # Укажите путь к вашей папки с фотоархивами на сервере относительно файла docker-compose или абсолютный
+        - ./photos:/test_photos
+
+  
+
+
