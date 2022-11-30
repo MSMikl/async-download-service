@@ -38,10 +38,15 @@ async def send_archive(request):
             if delay:
                 await asyncio.sleep(delay)
             number += 1
+            number = 1/0
             logger.info(f"Sending archive chunk {number}")
             await response.write(part)
     except ConnectionResetError:
         logger.warning('Downloading cancelled')
+        await process.communicate()
+        return
+    except:
+        logger.exception()
         await process.communicate()
         return
     await process.communicate()
