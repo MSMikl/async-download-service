@@ -60,8 +60,8 @@ async def send_archive(request):
 if __name__ == '__main__':
     env.read_env()
     logging_turned_on = env.bool('LOGGING', True)
-    logger.setLevel(logging.INFO)
     if logging_turned_on:
+        logger.setLevel(logging.INFO)
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.INFO)
         logger.addHandler(stream_handler)
