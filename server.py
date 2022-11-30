@@ -60,10 +60,10 @@ async def send_archive(request):
 if __name__ == '__main__':
     env.read_env()
     logging_turned_on = env.bool('LOGGING', True)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.INFO)
     logger.setLevel(logging.INFO)
     if logging_turned_on:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.INFO)
         logger.addHandler(stream_handler)
     app = web.Application()
     app.add_routes([
