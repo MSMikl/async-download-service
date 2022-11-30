@@ -8,11 +8,6 @@ from environs import Env
 
 
 env = Env()
-env.read_env()
-
-LOGGING = env.bool('LOGGING', True)
-PHOTO_PATH = env('PHOTO_PATH', 'test_photos')
-DELAY = env.int('DELAY', 0)
 
 logger = logging.getLogger('server')
 
@@ -25,7 +20,8 @@ async def handle_index_page(request):
 
 async def send_archive(request):
     hash = request.match_info['archive_hash']
-    path = os.path.join(PHOTO_PATH, hash)
+    photo_path = env('PHOTO_PATH', 'test_photos')
+    path = os.path.join(photo_path, hash)
     if not os.path.isdir(path):
         raise web.HTTPNotFound(text='Архива не существует, или он был удален')
     args = ['-r', '-9', '-', '.']
@@ -35,11 +31,12 @@ async def send_archive(request):
     await response.prepare(request)
     process = await asyncio.create_subprocess_exec('zip', *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=path)
     number = 0
+    delay = env.int('DELAY', 0)
     try:
         while not process.stdout.at_eof():
             part = await process.stdout.read(500000)
-            if DELAY:
-                await asyncio.sleep(DELAY)
+            if delay:
+                await asyncio.sleep(delay)
             number += 1
             logger.info(f"Sending archive chunk {number}")
             await response.write(part)
@@ -53,10 +50,12 @@ async def send_archive(request):
 
 
 if __name__ == '__main__':
+    env.read_env()
+    logging_turned_on = env.bool('LOGGING', True)
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
     logger.setLevel(logging.INFO)
-    if LOGGING:
+    if logging_turned_on:
         logger.addHandler(stream_handler)
     app = web.Application()
     app.add_routes([
