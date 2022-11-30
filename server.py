@@ -19,9 +19,9 @@ async def handle_index_page(request):
 
 
 async def send_archive(request):
-    hash = request.match_info['archive_hash']
+    photo_dir = request.match_info['archive_hash']
     photo_path = env('PHOTO_PATH', 'test_photos')
-    path = os.path.join(photo_path, hash)
+    path = os.path.join(photo_path, photo_dir)
     if not os.path.isdir(path):
         raise web.HTTPNotFound(text='Архива не существует, или он был удален')
     args = ['-r', '-9', '-', '.']
