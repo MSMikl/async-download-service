@@ -29,7 +29,7 @@ async def send_archive(request):
     await response.prepare(request)
     process = await asyncio.create_subprocess_exec('zip', *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=path)
     number = 0
-    delay = app['delay']
+    delay = request.app['delay']
     try:
         while not process.stdout.at_eof():
             part = await process.stdout.read(500000)
