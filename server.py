@@ -17,9 +17,8 @@ async def handle_index_page(request):
 
 
 async def send_archive(request):
-    env = Env()
     photo_dir = request.match_info['archive_hash']
-    photo_path = env('PHOTO_PATH', 'test_photos')
+    photo_path = request.app['photo_path']
     path = os.path.join(photo_path, photo_dir)
     if not os.path.isdir(path):
         raise web.HTTPNotFound(text='Архива не существует, или он был удален')
@@ -30,7 +29,7 @@ async def send_archive(request):
     await response.prepare(request)
     process = await asyncio.create_subprocess_exec('zip', *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=path)
     number = 0
-    delay = env.int('DELAY', 0)
+    delay = app['delay']
     try:
         while not process.stdout.at_eof():
             part = await process.stdout.read(500000)
@@ -66,6 +65,8 @@ if __name__ == '__main__':
         stream_handler.setLevel(logging.INFO)
         logger.addHandler(stream_handler)
     app = web.Application()
+    app['photo_path'] = env('PHOTO_PATH', 'test_photos')
+    app['delay'] = env.int('DELAY', 0)
     app.add_routes([
         web.get('/', handle_index_page),
         web.get('/archive/{archive_hash}/', send_archive),
