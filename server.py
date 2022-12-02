@@ -40,15 +40,15 @@ async def send_archive(request):
             await response.write(part)
     except ConnectionResetError:
         logger.warning('Downloading cancelled')
-        await process.communicate()
+        process.kill()
         return
     except asyncio.CancelledError:
-        logger.exception()
-        await process.communicate()
+        logger.exception('')
+        process.kill()
         raise
     except:
-        logger.exception()
-        await process.communicate()
+        logger.exception('')
+        process.kill()
         return
     await process.communicate()
     if process.returncode == 0: 
