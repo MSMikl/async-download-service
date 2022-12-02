@@ -7,8 +7,6 @@ from aiohttp import web
 from environs import Env
 
 
-env = Env()
-
 logger = logging.getLogger('server')
 
 
@@ -19,6 +17,7 @@ async def handle_index_page(request):
 
 
 async def send_archive(request):
+    env = Env()
     photo_dir = request.match_info['archive_hash']
     photo_path = env('PHOTO_PATH', 'test_photos')
     path = os.path.join(photo_path, photo_dir)
@@ -58,6 +57,7 @@ async def send_archive(request):
 
 
 if __name__ == '__main__':
+    env = Env()
     env.read_env()
     logging_turned_on = env.bool('LOGGING', True)
     if logging_turned_on:
