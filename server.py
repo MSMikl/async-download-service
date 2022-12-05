@@ -36,21 +36,18 @@ async def send_archive(request):
             if delay:
                 await asyncio.sleep(delay)
             number += 1
-            if number == 50:
-                raise SystemExit()
             logger.info(f"Sending archive chunk {number}")
             await response.write(part)
-    except (ConnectionResetError, SystemExit, KeyboardInterrupt) as e:
-        logger.exception(e)
-        process.kill()
-        return
+        logger.info(f'Archive {photo_dir} downloaded')
     except asyncio.CancelledError:
         logger.exception('')
         process.kill()
         raise
-    await process.communicate()
-    if process.returncode == 0: 
-        return response
+    finally:
+        if process.returncode == 0: 
+            return response
+        process.kill()
+        await process.communicate()
 
 
 if __name__ == '__main__':
