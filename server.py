@@ -41,13 +41,13 @@ async def send_archive(request):
         logger.info(f'Archive {photo_dir} downloaded')
     except asyncio.CancelledError:
         logger.exception('')
-        process.kill()
         raise
     finally:
         if process.returncode == 0: 
             return response
-        process.kill()
-        await process.communicate()
+        if not process.returncode:
+            process.kill()
+            await process.communicate()
 
 
 if __name__ == '__main__':
