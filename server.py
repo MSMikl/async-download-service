@@ -45,7 +45,7 @@ async def send_archive(request):
     finally:
         if process.returncode == 0: 
             return response
-        if not process.returncode:
+        if process.returncode is None:
             process.kill()
             await process.communicate()
 
